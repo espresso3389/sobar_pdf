@@ -1,24 +1,25 @@
-#!/bin/bash -eu
+#!/bin/bash -e
 
 # https://pdfium.googlesource.com/pdfium/+/refs/heads/chromium/4147
-#LAST_KNOWN_GOOD_COMMIT=3e36f68831431bf497babc74075cd69af5fd9823
+# LAST_KNOWN_GOOD_COMMIT=235683e8c00b558fd4ab484b577233ccfeca6a63
 
 scripts_dir=$(cd $(dirname $0) && pwd)
-VCPKG_TARGET_TRIPLET=$1
-# x64 or x86
+SOBAR_TARGET_STR=$1
+# x64, x86, ...
 GN_ARCH=$2
 # static or dll
 STATIC_OR_DLL=$3
 # Release or Debug
 REL_OR_DBG=$4
-
 DEPOT_DIR=$5
+WORK_DIR=$6
+TARGET_OS=$7
 
 export PATH=$DEPOT_DIR:$PATH
 
 IS_SHAREDLIB=false
 
-if [ $REL_OR_DBG = "Release" ]; then
+if [ "$REL_OR_DBG" = "Release" ]; then
     IS_DEBUG=false
     DEBUG_DIR_SUFFIX=
 else
@@ -26,29 +27,42 @@ else
     DEBUG_DIR_SUFFIX=/debug
 fi
 
-if [[ $VCPKG_TARGET_TRIPLET == *"osx"* ]]; then
+if [[ "$SOBAR_TARGET_STR" == *"osx"* || "$SOBAR_TARGET_STR" == *"android"* ]]; then
   IS_CLANG=true
 else
   IS_CLANG=false
 fi
 
+cd $WORK_DIR
 if [ ! -d pdfium/.git/index ]; then
-    gclient config -vvv --unmanaged https://pdfium.googlesource.com/pdfium.git
+    gclient config --unmanaged https://pdfium.googlesource.com/pdfium.git
+
+    if [ "$TARGET_OS" == "android" ]; then
+      echo "target_os = [ 'android' ]" >> $DEPOT_DIR/../.gclient
+    fi
+
     gclient sync -vvv
 fi
 
-cd pdfium
 ROOTDIR=$(pwd)
-BUILDDIR=$ROOTDIR/out/$VCPKG_TARGET_TRIPLET$DEBUG_DIR_SUFFIX
+if [ "$TARGET_OS" == "android" ]; then
+  $ROOTDIR/pdfium/build/install-build-deps-android.sh
+fi
 
+BUILDDIR=$ROOTDIR/pdfium/out/$SOBAR_TARGET_STR$DEBUG_DIR_SUFFIX
 mkdir -p $BUILDDIR
 
-git reset --hard
-git checkout $LAST_KNOWN_GOOD_COMMIT
+if [ "$LAST_KNOWN_GOOD_COMMIT" != "" ]; then
+  pushd pdfium
+  git reset --hard
+  git checkout $LAST_KNOWN_GOOD_COMMIT
+  popd
+fi
 
 cat <<EOF > $BUILDDIR/args.gn
 is_clang = $IS_CLANG
 use_custom_libcxx=false
+target_os = "$TARGET_OS"
 target_cpu = "$GN_ARCH"
 pdf_is_complete_lib = true
 pdf_is_standalone = true
@@ -61,5 +75,8 @@ pdf_enable_v8 = false
 #use_glib = false
 EOF
 
-gn gen $BUILDDIR
+pushd $BUILDDIR
+gn gen .
+popd
+
 ninja -C $BUILDDIR pdfium

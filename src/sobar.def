@@ -1,0 +1,23 @@
+LIBRARY "sobar"
+
+EXPORTS
+    sbr_Initialize              @1
+    sbr_Finalize             @2
+    sbr_PdfDocumentOpenFile     @3
+    sbr_PdfDocumentOpenMemory   @4
+    sbr_PdfDocumentOpenCustom   @5
+    sbr_PdfDocumentClose        @6
+    sbr_PdfDocumentGetPageCount @7
+    sbr_PdfDocumentLoadPage     @8
+    sbr_PdfPageClose            @9
+    sbr_PdfPageGetWidth         @10
+    sbr_PdfPageGetHeight        @11
+    sbr_PdfPageGetRotation      @12
+    sbr_PdfPageRender           @13
+    sbr_PdfBitmapCreate         @14
+    sbr_PdfBitmapRelease        @15
+    sbr_PdfBitmapGetPixelFormat @16
+    sbr_PdfBitmapGetScan0Pointer @17
+    sbr_PdfBitmapGetStride      @18
+    sbr_PdfBitmapGetWidth       @19
+    sbr_PdfBitmapGetHeight      @20

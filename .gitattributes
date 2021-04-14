@@ -11,3 +11,4 @@
 *.bat   text eol=crlf
 *.plist text eof=lf
 *.patch text eof=lf
+*.yaml  text eof=lf
