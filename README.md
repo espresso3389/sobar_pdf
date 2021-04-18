@@ -4,7 +4,7 @@
 
 sobar is a simple PDF renderer implementation based on [pdfium](https://pdfium.googlesource.com/pdfium/) targeted for Windows and Linux.
 
-The first motivation for the project is to support Windows and Linux on [flutter_pdf_render][https://github.com/espresso3389/flutter_pdf_render] plugin.
+The first motivation for the project is to support Windows and Linux on [flutter_pdf_render](https://github.com/espresso3389/flutter_pdf_render) plugin.
 
 # How to build
 
