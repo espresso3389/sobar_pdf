@@ -24,6 +24,12 @@ else
   arch_full=$arch
 fi
 
+if [[ "$targetOS" == "mac" || "$targetOS" == "ios" ]]; then
+  ext=dylib
+else
+  ext=so
+fi
+
 source ./scripts/git_info.sh . Sobar
 
 cmake -S . -B $outDir -G Ninja \
@@ -42,4 +48,4 @@ cp include/sobar.h $distDir/include
 
 libDir=$distDir/lib/linux/$arch
 mkdir -p $libDir
-cp $tmpDir/$arch/src/libsobar.so $libDir
+cp $tmpDir/$arch/src/libsobar.$ext $libDir
