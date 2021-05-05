@@ -18,6 +18,11 @@ For Windows, you can build the library using `build.ps1` PowerShell script. It a
 .\build.ps1 x64
 ```
 
-## Linux
+## Linux/Android/macOS/iOS
 
-TBD
+`./build.sh` accepts two parameters. The first one is `ARCH`, which should be one of `x86`, `x64`, `arm`, or `arm64`. The second one is `PLATFORM`, one of `linux`, `android`, `mac`, or `ios`:
+
+
+```sh
+./build.sh x64 linux
+```
