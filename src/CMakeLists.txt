@@ -151,6 +151,10 @@ target_include_directories(sobar PRIVATE
   .
 )
 
+if(UNIX)
+  target_compile_options(sobar PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-std=c++14>)
+endif()
+
 # setup_def_build_opts_with_dep(sobar dependency)
 #target_link_libraries(sobar pdfium -static-libgcc -static-libstdc++)
 target_link_libraries(sobar pdfium)

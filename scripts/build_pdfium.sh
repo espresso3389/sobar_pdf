@@ -4,6 +4,7 @@
 # LAST_KNOWN_GOOD_COMMIT=235683e8c00b558fd4ab484b577233ccfeca6a63
 
 scripts_dir=$(cd $(dirname $0) && pwd)
+# linux, android, mac, ios
 SOBAR_TARGET_STR=$1
 # x64, x86, ...
 GN_ARCH=$2
@@ -27,7 +28,7 @@ else
     DEBUG_DIR_SUFFIX=/debug
 fi
 
-if [[ "$SOBAR_TARGET_STR" == *"osx"* || "$SOBAR_TARGET_STR" == *"android"* ]]; then
+if [[ "$TARGET_OS" == "mac" || "$TARGET_OS" == "ios" || "$TARGET_OS" == "android" ]]; then
   IS_CLANG=true
 else
   IS_CLANG=false
