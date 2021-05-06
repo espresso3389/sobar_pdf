@@ -88,6 +88,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Setup Ninja
+        uses: ashutoshvarma/setup-ninja@master
+
       - name: Build
         run: ./build.sh ${{ matrix.arch }} mac
 
