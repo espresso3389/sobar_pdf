@@ -30,6 +30,10 @@ else
   ext=so
 fi
 
+if [[ "$targetOS" == "ios" ]]; then
+  IOS_DEFINITIONS=-DCMAKE_SYSTEM_NAME=iOS
+fi
+
 source ./scripts/git_info.sh . Sobar
 
 cmake -S . -B $outDir -G Ninja \
@@ -39,7 +43,8 @@ cmake -S . -B $outDir -G Ninja \
     -DSOBAR_COMMIT=$SobarCommit \
     -DSOBAR_TMP_DIR=$tmpDir \
     -DSOBAR_CACHE_DIR=$cacheDir \
-    -DCMAKE_OSX_ARCHITECTURES=$arch_full
+    -DCMAKE_OSX_ARCHITECTURES=$arch_full \
+    $IOS_DEFINITIONS
 
 cmake --build $outDir
 

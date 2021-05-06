@@ -34,6 +34,12 @@ else
   IS_CLANG=false
 fi
 
+if [[ "$TARGET_OS" == "ios" && "$GN_ARCH" == "arm"* ]]; then
+  ENABLE_BIT_CODE=true
+else
+  ENABLE_BIT_CODE=false
+fi
+
 cd $WORK_DIR
 if [ ! -d pdfium/.git/index ]; then
     gclient config --unmanaged https://pdfium.googlesource.com/pdfium.git
@@ -50,7 +56,8 @@ if [ "$TARGET_OS" == "android" ]; then
   $ROOTDIR/pdfium/build/install-build-deps-android.sh
 fi
 
-BUILDDIR=$ROOTDIR/pdfium/out/$SOBAR_TARGET_STR$DEBUG_DIR_SUFFIX
+PDFIUM_SRCDIR=$ROOTDIR/pdfium
+BUILDDIR=$PDFIUM_SRCDIR/out/$SOBAR_TARGET_STR$DEBUG_DIR_SUFFIX
 mkdir -p $BUILDDIR
 
 if [ "$LAST_KNOWN_GOOD_COMMIT" != "" ]; then
@@ -58,6 +65,13 @@ if [ "$LAST_KNOWN_GOOD_COMMIT" != "" ]; then
   git reset --hard
   git checkout $LAST_KNOWN_GOOD_COMMIT
   popd
+fi
+
+if [[ "$TARGET_OS" == "ios" ]]; then
+  sed -i.bak -E "s/(assert\(!is_ios,)/#\1/g" $PDFIUM_SRCDIR/third_party/libjpeg_turbo/BUILD.gn
+  sed -i.bak -E "s/# TEST SETUP/ios_automatically_manage_certs = true/" $PDFIUM_SRCDIR/testing/test.gni
+  sed -i.bak -E "s/Carbon\/Carbon/CoreGraphics\/CoreGraphics/" $PDFIUM_SRCDIR/core/fpdfapi/font/cpdf_type1font.cpp
+  sed -i.bak -E "s/Carbon\/Carbon/CoreGraphics\/CoreGraphics/" $PDFIUM_SRCDIR/core/fxge/apple/fx_quartz_device.h
 fi
 
 cat <<EOF > $BUILDDIR/args.gn
@@ -74,6 +88,9 @@ pdf_enable_xfa = false
 pdf_enable_v8 = false
 # Reduce dependency to GLIBC
 #use_glib = false
+ios_enable_code_signing = false
+#use_xcode_clang = true
+enable_ios_bitcode= $ENABLE_BIT_CODE
 EOF
 
 pushd $BUILDDIR
