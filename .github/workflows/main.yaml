@@ -51,7 +51,7 @@ jobs:
         run: sudo apt install ninja-build gcc-multilib g++-multilib
 
       - name: Build
-        run: ./build.sh ${{ matrix.arch }}
+        run: ./build.sh ${{ matrix.arch }} linux
 
       - uses: actions/upload-artifact@v2
         with:
@@ -77,3 +77,22 @@ jobs:
   #         name: sobar-android-${{ matrix.arch }}-r${{ env.SobarREV }}-${{ env.SobarCOMMIT }}
   #         path: dist/${{ matrix.arch }}
   #         #retention-days: 1
+
+  build_mac:
+    runs-on: macos-11.0
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        arch: ["x64", "arm64"]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build
+        run: ./build.sh ${{ matrix.arch }} mac
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: sobar-mac-${{ matrix.arch }}-r${{ env.SobarREV }}-${{ env.SobarCOMMIT }}
+          path: dist/${{ matrix.arch }}
+          #retention-days: 1
