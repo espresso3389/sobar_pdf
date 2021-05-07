@@ -31,7 +31,7 @@ else
 fi
 
 if [[ "$targetOS" == "ios" ]]; then
-  IOS_DEFINITIONS=-DCMAKE_SYSTEM_NAME=iOS
+  IOS_DEFINITIONS=-DCMAKE_TOOLCHAIN_FILE=$curDir/scripts/ios-cmake/toolchain/iOS.cmake
 fi
 
 source ./scripts/git_info.sh . Sobar

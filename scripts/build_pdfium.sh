@@ -72,6 +72,7 @@ if [[ "$TARGET_OS" == "ios" ]]; then
   sed -i.bak -E "s/# TEST SETUP/ios_automatically_manage_certs = true/" $PDFIUM_SRCDIR/testing/test.gni
   sed -i.bak -E "s/Carbon\/Carbon/CoreGraphics\/CoreGraphics/" $PDFIUM_SRCDIR/core/fpdfapi/font/cpdf_type1font.cpp
   sed -i.bak -E "s/Carbon\/Carbon/CoreGraphics\/CoreGraphics/" $PDFIUM_SRCDIR/core/fxge/apple/fx_quartz_device.h
+  sed -i.bak -E "s/is_mac/is_ios/" $PDFIUM_SRCDIR/core/fxge/BUILD.gn
 fi
 
 cat <<EOF > $BUILDDIR/args.gn
