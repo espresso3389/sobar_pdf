@@ -1,0 +1,39 @@
+
+name: iOS
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - release*
+
+    paths-ignore:
+    - 'README.md'
+    - '.vscode/**'
+    - '.gitignore'
+    - '.gitattributes'
+    - '.editorconfig'
+
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        arch: ["x64", "arm64"]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Ninja
+        uses: ashutoshvarma/setup-ninja@master
+
+      - name: Build
+        run: ./build.sh ${{ matrix.arch }} ios
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: sobar-ios-${{ matrix.arch }}-r${{ env.SobarREV }}-${{ env.SobarCOMMIT }}
+          path: dist/${{ matrix.arch }}
+          #retention-days: 1

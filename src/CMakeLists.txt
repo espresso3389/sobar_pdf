@@ -115,6 +115,20 @@ if(SOBAR_PLATFORM STREQUAL "android")
 
 endif()
 
+if(SOBAR_PLATFORM STREQUAL "ios")
+  unset(CMAKE_INSTALL_NAME_TOOL)
+  unset(IOS_PLATFORM CACHE)
+  if(SOBAR_ARCH STREQUAL "x64")
+    set(IOS_PLATFORM SIMULATOR)
+  endif()
+  unset(BUILD_ARM64 CACHE)
+  unset(CMAKE_IOS_DEVELOPER_ROOT CACHE)
+  unset(CMAKE_IOS_SDK_ROOT CACHE)
+  unset(CMAKE_OSX_SYSROOT CACHE)
+  set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../scripts/ios-cmake/toolchain/iOS.cmake)
+  include(${CMAKE_TOOLCHAIN_FILE})
+endif()
+
 ##########################################################################
 set(SOBAR_SOURCES
   sobar.cpp
