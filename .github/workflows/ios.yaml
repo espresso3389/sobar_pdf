@@ -52,18 +52,18 @@ jobs:
     steps:
       - uses: actions/download-artifact@master
         with:
-          name: sobar-ios-x64-${{ needs.build.outputs.suffix }}
+          name: sobar-ios-x64${{ needs.build.outputs.suffix }}
           path: x64
       
       - uses: actions/download-artifact@master
         with:
-          name: sobar-ios-arm64-${{ needs.build.outputs.suffix }}
+          name: sobar-ios-arm64${{ needs.build.outputs.suffix }}
           path: arm64
 
       - name: Lipo architecture libraries
         run: |
           mkdir -p dist/universal/include/
-          cp dist/x64/include/sobar.h dist/universal/include/
+          cp x64/include/sobar.h dist/universal/include/
           mkdir -p dist/universal/lib/ios/universal/
           lipo -create x64/libsobar.dylib arm64/libsobar.dylib -output dist/universal/lib/ios/universal/libsobar.dylib
 
