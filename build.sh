@@ -47,6 +47,6 @@ cmake --build $outDir
 mkdir -p $distDir/include
 cp include/sobar.h $distDir/include
 
-libDir=$distDir/lib/linux/$arch
+libDir=$distDir/lib/$targetOS/$arch
 mkdir -p $libDir
 cp $tmpDir/$arch/src/libsobar.$ext $libDir

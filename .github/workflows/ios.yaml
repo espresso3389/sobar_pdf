@@ -1,4 +1,3 @@
-
 name: iOS
 
 on:
@@ -22,6 +21,8 @@ jobs:
     strategy:
       matrix:
         arch: ["x64", "arm64"]
+    outputs:
+      suffix: ${{ steps.filename.outputs.suffix }}
 
     steps:
       - uses: actions/checkout@v2
@@ -34,8 +35,40 @@ jobs:
       - name: Build
         run: ./build.sh ${{ matrix.arch }} ios
 
+      - id: filename
+        run: echo "::set-output name=suffix::-r${{ env.SobarREV }}-${{ env.SobarCOMMIT }}"
+
       - uses: actions/upload-artifact@v2
         with:
           name: sobar-ios-${{ matrix.arch }}-r${{ env.SobarREV }}-${{ env.SobarCOMMIT }}
           path: dist/${{ matrix.arch }}
+          #retention-days: 1
+
+  lipo:
+    runs-on: macos-latest
+    timeout-minutes: 10
+    needs: build
+
+    steps:
+      - uses: actions/download-artifact@master
+        with:
+          name: sobar-ios-x64-${{ needs.build.outputs.suffix }}
+          path: x64
+      
+      - uses: actions/download-artifact@master
+        with:
+          name: sobar-ios-arm64-${{ needs.build.outputs.suffix }}
+          path: arm64
+
+      - name: Lipo architecture libraries
+        run: |
+          mkdir -p dist/universal/include/
+          cp dist/x64/include/sobar.h dist/universal/include/
+          mkdir -p dist/universal/lib/ios/universal/
+          lipo -create x64/libsobar.dylib arm64/libsobar.dylib -output dist/universal/lib/ios/universal/libsobar.dylib
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: sobar-ios-universal-${{ needs.build.outputs.suffix }}
+          path: dist/universal
           #retention-days: 1
