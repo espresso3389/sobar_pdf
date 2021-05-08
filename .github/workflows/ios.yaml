@@ -65,7 +65,7 @@ jobs:
           mkdir -p dist/universal/include/
           cp x64/include/sobar.h dist/universal/include/
           mkdir -p dist/universal/lib/ios/universal/
-          lipo -create x64/libsobar.dylib arm64/libsobar.dylib -output dist/universal/lib/ios/universal/libsobar.dylib
+          lipo -create x64/lib/linux/x64/libsobar.dylib arm64/lib/linux/arm64/libsobar.dylib -output dist/universal/lib/ios/universal/libsobar.dylib
 
       - uses: actions/upload-artifact@v2
         with:
