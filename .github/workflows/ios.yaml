@@ -59,16 +59,13 @@ jobs:
         with:
           name: sobar-ios-arm64${{ needs.build.outputs.suffix }}
           path: arm64
-      
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
 
       - name: Lipo architecture libraries
         run: |
           mkdir -p dist/universal/include/
           cp x64/include/sobar.h dist/universal/include/
           mkdir -p dist/universal/lib/ios/universal/
-          lipo -create x64/lib/linux/x64/libsobar.dylib arm64/lib/linux/arm64/libsobar.dylib -output dist/universal/lib/ios/universal/libsobar.dylib
+          lipo -create x64/lib/ios/x64/libsobar.dylib arm64/lib/ios/arm64/libsobar.dylib -output dist/universal/lib/ios/universal/libsobar.dylib
 
       - uses: actions/upload-artifact@v2
         with:
