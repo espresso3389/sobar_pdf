@@ -34,11 +34,11 @@ jobs:
         run: ./build.sh ${{ matrix.arch }} mac
 
       - id: filename
-        run: echo "::set-output name=suffix::-r${{ env.SobarREV }}-${{ env.SobarCOMMIT }}"
+        run: echo "::set-output name=suffix::-r${{ github.run_number }}-${{ env.SobarCOMMIT }}"
 
       - uses: actions/upload-artifact@v2
         with:
-          name: sobar-mac-${{ matrix.arch }}-r${{ env.SobarREV }}-${{ env.SobarCOMMIT }}
+          name: sobar-mac-${{ matrix.arch }}-r${{ github.run_number }}-${{ env.SobarCOMMIT }}
           path: dist/${{ matrix.arch }}
           #retention-days: 1
 

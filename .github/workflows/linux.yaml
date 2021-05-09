@@ -36,6 +36,6 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: sobar-linux-${{ matrix.arch }}-r${{ env.SobarREV }}-${{ env.SobarCOMMIT }}
+          name: sobar-linux-${{ matrix.arch }}-r${{ github.run_number }}-${{ env.SobarCOMMIT }}
           path: dist/${{ matrix.arch }}
           #retention-days: 1

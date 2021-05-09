@@ -32,6 +32,10 @@ fi
 
 source ./scripts/git_info.sh . Sobar
 
+if [[ "$GITHUB_RUN_NUMBER" != "" ]]; then
+  SobarRev=$GITHUB_RUN_NUMBER
+fi
+
 cmake -S . -B $outDir -G Ninja \
     -DCMAKE_BUILD_TYPE=Release \
     -DSOBAR_TARGET_STR=$sobarTargetStr \
