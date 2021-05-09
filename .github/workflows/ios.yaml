@@ -69,6 +69,6 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: sobar-ios-universal-${{ needs.build.outputs.suffix }}
+          name: sobar-ios-universal${{ needs.build.outputs.suffix }}
           path: dist/universal
           #retention-days: 1
