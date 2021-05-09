@@ -59,6 +59,9 @@ jobs:
         with:
           name: sobar-ios-arm64${{ needs.build.outputs.suffix }}
           path: arm64
+      
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
 
       - name: Lipo architecture libraries
         run: |
