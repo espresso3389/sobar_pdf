@@ -179,8 +179,8 @@ class PdfBitmap
 {
 public:
 	PdfBitmap(int width, int height, sbr_PixelFormat format, long stride,
-			  void *scan0, sbr_PdfBitmapOnReleaseCallback callback, void *context)
-		: m_buffer(nullptr)
+						void *scan0, sbr_PdfBitmapOnReleaseCallback callback, void *context)
+			: m_buffer(nullptr)
 	{
 		if (width <= 0)
 			throw std::invalid_argument("width must be positive integer value.");
@@ -200,7 +200,7 @@ public:
 
 		m_format = format;
 		m_bmp = FPDFBitmap_CreateEx(
-			width, height, pixmapTypeToFPDFBitmapType(format), scan0, stride);
+				width, height, pixmapTypeToFPDFBitmapType(format), scan0, stride);
 		if (!m_bmp)
 			throw std::invalid_argument("FPDFBitmap_CreateEx failed.");
 
@@ -295,7 +295,7 @@ class PdfPage
 {
 public:
 	PdfPage(const std::shared_ptr<const PdfDocument> &doc, FPDF_PAGE page)
-		: m_doc(&doc)
+			: m_doc(&doc)
 	{
 		m_page = page;
 	}
@@ -368,7 +368,7 @@ sbr_EXPORT void sbr_API sbr_Finalize()
 }
 
 sbr_EXPORT sbr_PdfDocument sbr_API sbr_PdfDocumentOpenFile(
-	const char *utf8FileName, const char *utf8Password)
+		const char *utf8FileName, const char *utf8Password)
 {
 	try
 	{
@@ -385,7 +385,7 @@ sbr_EXPORT sbr_PdfDocument sbr_API sbr_PdfDocumentOpenFile(
 }
 
 sbr_EXPORT sbr_PdfDocument sbr_API sbr_PdfDocumentOpenMemory(
-	const void *data, unsigned int size, const char *utf8Password)
+		const void *data, unsigned int size, const char *utf8Password)
 {
 	try
 	{
@@ -398,7 +398,7 @@ sbr_EXPORT sbr_PdfDocument sbr_API sbr_PdfDocumentOpenMemory(
 }
 
 sbr_EXPORT sbr_PdfDocument sbr_API sbr_PdfDocumentOpenCustom(
-	void *context, unsigned int size, sbr_ContextReadCallback read, sbr_ContextReleaseCallback release, const char *utf8Password)
+		void *context, unsigned int size, sbr_ContextReadCallback read, sbr_ContextReleaseCallback release, const char *utf8Password)
 {
 	try
 	{
@@ -498,10 +498,10 @@ sbr_EXPORT int sbr_API sbr_PdfPageGetRotation(sbr_PdfPage page)
 }
 
 sbr_EXPORT int sbr_API sbr_PdfPageRender(sbr_PdfPage page,
-										 sbr_PdfBitmap bmp, int x, int y,
-										 int width, int height,
-										 sbr_RotateClockwise rotate,
-										 int flags)
+																				 sbr_PdfBitmap bmp, int x, int y,
+																				 int width, int height,
+																				 sbr_RotateClockwise rotate,
+																				 int flags)
 {
 	try
 	{
@@ -517,13 +517,23 @@ sbr_EXPORT int sbr_API sbr_PdfPageRender(sbr_PdfPage page,
 }
 
 sbr_EXPORT sbr_PdfBitmap sbr_API sbr_PdfBitmapCreate(
-	int width, int height, sbr_PixelFormat format, long stride, void *scan0,
-	sbr_PdfBitmapOnReleaseCallback callback, void *context)
+		int width, int height, sbr_PixelFormat format, long stride, void *scan0,
+		sbr_PdfBitmapOnReleaseCallback callback, void *context)
 {
 	try
 	{
+		if (!stride && !scan0 && !callback && !context)
+		{
+			static const int bpp[] = {0, 1, 3, 4, 3, 4};
+			stride = width * bpp[format];
+			scan0 = new unsigned char[stride * height];
+			callback = [](void *ptr)
+			{ delete[] reinterpret_cast<unsigned char *>(ptr); };
+			context = scan0;
+		}
+
 		return new std::shared_ptr<PdfBitmap>(
-			new PdfBitmap(width, height, format, stride, scan0, callback, context));
+				new PdfBitmap(width, height, format, stride, scan0, callback, context));
 	}
 	catch (...)
 	{
