@@ -6,6 +6,36 @@ sobar is a simple PDF renderer implementation based on [pdfium](https://pdfium.g
 
 The first motivation for the project is to support Windows and Linux on [flutter_pdf_render](https://github.com/espresso3389/flutter_pdf_render) plugin.
 
+
+# Prerequisites
+
+## Windows
+
+For the following components, see [Checking out and Building Chromium for Windows](https://chromium.googlesource.com/chromium/src/+/HEAD/docs/windows_build_instructions.md#visual-studio).
+
+- [Visual Studio 2019](https://visualstudio.microsoft.com/)
+- Debugging Tools for Windows
+
+Use [scoop](https://scoop.sh/) to install additional commands:
+
+```
+scoop install cmake ninja git
+```
+
+## Linux (Ubuntu 20.04 LTS)
+
+```
+sudo apt install git build-essential cmake ninja-build pkg-config
+```
+
+## macOS
+
+[Homebrew](https://brew.sh/) is a command-line package manager for macOS.
+
+```
+brew install git cmake ninja
+```
+
 # How to build
 
 If you just need your copy of sobar modules, please just fork the repo. You'll find your copy is building on your "Actions" tab.
