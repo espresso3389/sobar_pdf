@@ -38,6 +38,11 @@
         "istream": "cpp",
         "__node_handle": "cpp",
         "__config": "cpp",
-        "__nullptr": "cpp"
+        "__nullptr": "cpp",
+        "cstring": "cpp"
+    },
+    "files.watcherExclude": {
+        ".cache/**": true,
+        ".work/**": true
     }
 }
