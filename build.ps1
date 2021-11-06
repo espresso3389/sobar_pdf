@@ -8,7 +8,8 @@ Param(
 
 if ($GITHUB_RUN_NUMBER) {
   $sobarRev = $GITHUB_RUN_NUMBER
-} else {
+}
+else {
   $sobarRev = $env:SobarREV
 }
 
@@ -17,7 +18,9 @@ $tmpDir = "$curDir/.work"
 $cacheDir = "$curDir/.cache"
 $outDir = "$curDir/.work/$Arch"
 
-cmake -S . -B "$outDir" -G Ninja -DCMAKE_BUILD_TYPE=Release "-DSOBAR_TARGET_STR=windows-$Arch-static" "-DSOBAR_REVISION=$sobarRev" "-DSOBAR_COMMIT=$env:SobarCOMMIT" "-DSOBAR_TMP_DIR=$tmpDir" "-DSOBAR_CACHE_DIR=$cacheDir"
+$compiler = "${env:VCToolsInstallDir}bin/HostX64/$Arch/cl.exe".Replace("\", "/")
+
+cmake -S . -B "$outDir" -G Ninja -DCMAKE_BUILD_TYPE=Release "-DSOBAR_TARGET_STR=windows-$Arch-static" "-DSOBAR_REVISION=$sobarRev" "-DSOBAR_COMMIT=$env:SobarCOMMIT" "-DSOBAR_TMP_DIR=$tmpDir" "-DSOBAR_CACHE_DIR=$cacheDir" "-DCMAKE_C_COMPILER=$compiler" "-DCMAKE_CXX_COMPILER=$compiler"
 
 cmake --build "$outDir"
 
