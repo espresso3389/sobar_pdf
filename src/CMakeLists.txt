@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.21)
 cmake_policy(SET CMP0091 NEW)
 
 ##########################################################################
@@ -18,7 +18,7 @@ endif()
 
 add_library(pdfium STATIC IMPORTED)
 set_target_properties(pdfium PROPERTIES IMPORTED_LOCATION ${work_dir}/pdfium/out/${SOBAR_TARGET_STR}${DEBUG_DIR_SUFFIX}/obj/${pdfium_lib_filename})
-set_target_properties(pdfium PROPERTIES INTERFACE_INCLUDE_DIRECTORIES ${work_dir}/pdfium ${work_dir}/pdfium/third_party/abseil-cpp)
+set_target_properties(pdfium PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${work_dir}/pdfium;${work_dir}/pdfium/third_party/abseil-cpp")
 if(APPLE)
   target_link_libraries(pdfium INTERFACE "-framework CoreFoundation")
   target_link_libraries(pdfium INTERFACE "-framework CoreGraphics")
