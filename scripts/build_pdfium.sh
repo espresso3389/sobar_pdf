@@ -52,8 +52,9 @@ if [ ! -d pdfium/.git/index ]; then
 fi
 
 ROOTDIR=$(pwd)
-if [ "$TARGET_OS" == "android" ]; then
+if [[ "$TARGET_OS" == "android" && ! -e $ROOTDIR/.android.deps ]]; then
   $ROOTDIR/pdfium/build/install-build-deps-android.sh
+  touch $ROOTDIR/.android.deps
 fi
 
 PDFIUM_SRCDIR=$ROOTDIR/pdfium
@@ -65,6 +66,14 @@ if [ "$LAST_KNOWN_GOOD_COMMIT" != "" ]; then
   git reset --hard
   git checkout $LAST_KNOWN_GOOD_COMMIT
   popd
+fi
+
+if [ "$TARGET_OS" == "android" && ! -e $ROOTDIR/.android.patched ]; then
+  file=$PDFIUM_SRCDIR/core/fxge/android/cfpf_skiafont.cpp
+  echo -e "#pragma clang diagnostic ignored \"-Wshorten-64-to-32\"\n$(cat $file)" > $file
+  file=$PDFIUM_SRCDIR/core/fxge/android/cfpf_skiafontmgr.cpp
+  echo -e "#pragma clang diagnostic ignored \"-Wshorten-64-to-32\"\n$(cat $file)" > $file
+  touch $ROOTDIR/.android.patched
 fi
 
 if [[ "$TARGET_OS" == "ios" ]]; then
