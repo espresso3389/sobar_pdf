@@ -39,7 +39,8 @@
         "__node_handle": "cpp",
         "__config": "cpp",
         "__nullptr": "cpp",
-        "cstring": "cpp"
+        "cstring": "cpp",
+        "filesystem": "cpp"
     },
     "files.watcherExclude": {
         ".cache/**": true,

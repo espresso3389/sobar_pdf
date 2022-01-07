@@ -12,6 +12,7 @@
 typedef std::shared_ptr<const class PdfDocument> *sbr_PdfDocument;
 typedef std::shared_ptr<const class PdfPage> *sbr_PdfPage;
 typedef std::shared_ptr<class PdfBitmap> *sbr_PdfBitmap;
+typedef class CPDF_TextPage *sbr_PdfText;
 
 #include "sobar.h"
 
@@ -179,8 +180,8 @@ class PdfBitmap
 {
 public:
 	PdfBitmap(int width, int height, sbr_PixelFormat format, long stride,
-						void *scan0, sbr_PdfBitmapOnReleaseCallback callback, void *context)
-			: m_buffer(nullptr)
+			  void *scan0, sbr_PdfBitmapOnReleaseCallback callback, void *context)
+		: m_buffer(nullptr)
 	{
 		if (width <= 0)
 			throw std::invalid_argument("width must be positive integer value.");
@@ -200,7 +201,7 @@ public:
 
 		m_format = format;
 		m_bmp = FPDFBitmap_CreateEx(
-				width, height, pixmapTypeToFPDFBitmapType(format), scan0, stride);
+			width, height, pixmapTypeToFPDFBitmapType(format), scan0, stride);
 		if (!m_bmp)
 			throw std::invalid_argument("FPDFBitmap_CreateEx failed.");
 
@@ -295,7 +296,7 @@ class PdfPage
 {
 public:
 	PdfPage(const std::shared_ptr<const PdfDocument> &doc, FPDF_PAGE page)
-			: m_doc(&doc)
+		: m_doc(&doc)
 	{
 		m_page = page;
 	}
@@ -368,7 +369,7 @@ sbr_EXPORT void sbr_API sbr_Finalize()
 }
 
 sbr_EXPORT sbr_PdfDocument sbr_API sbr_PdfDocumentOpenFile(
-		const char *utf8FileName, const char *utf8Password)
+	const char *utf8FileName, const char *utf8Password)
 {
 	try
 	{
@@ -385,7 +386,7 @@ sbr_EXPORT sbr_PdfDocument sbr_API sbr_PdfDocumentOpenFile(
 }
 
 sbr_EXPORT sbr_PdfDocument sbr_API sbr_PdfDocumentOpenMemory(
-		const void *data, unsigned int size, const char *utf8Password)
+	const void *data, unsigned int size, const char *utf8Password)
 {
 	try
 	{
@@ -398,7 +399,7 @@ sbr_EXPORT sbr_PdfDocument sbr_API sbr_PdfDocumentOpenMemory(
 }
 
 sbr_EXPORT sbr_PdfDocument sbr_API sbr_PdfDocumentOpenCustom(
-		void *context, unsigned int size, sbr_ContextReadCallback read, sbr_ContextReleaseCallback release, const char *utf8Password)
+	void *context, unsigned int size, sbr_ContextReadCallback read, sbr_ContextReleaseCallback release, const char *utf8Password)
 {
 	try
 	{
@@ -498,10 +499,10 @@ sbr_EXPORT int sbr_API sbr_PdfPageGetRotation(sbr_PdfPage page)
 }
 
 sbr_EXPORT int sbr_API sbr_PdfPageRender(sbr_PdfPage page,
-																				 sbr_PdfBitmap bmp, int x, int y,
-																				 int width, int height,
-																				 sbr_RotateClockwise rotate,
-																				 int flags)
+										 sbr_PdfBitmap bmp, int x, int y,
+										 int width, int height,
+										 sbr_RotateClockwise rotate,
+										 int flags)
 {
 	try
 	{
@@ -517,8 +518,8 @@ sbr_EXPORT int sbr_API sbr_PdfPageRender(sbr_PdfPage page,
 }
 
 sbr_EXPORT sbr_PdfBitmap sbr_API sbr_PdfBitmapCreate(
-		int width, int height, sbr_PixelFormat format, long stride, void *scan0,
-		sbr_PdfBitmapOnReleaseCallback callback, void *context)
+	int width, int height, sbr_PixelFormat format, long stride, void *scan0,
+	sbr_PdfBitmapOnReleaseCallback callback, void *context)
 {
 	try
 	{
@@ -533,7 +534,7 @@ sbr_EXPORT sbr_PdfBitmap sbr_API sbr_PdfBitmapCreate(
 		}
 
 		return new std::shared_ptr<PdfBitmap>(
-				new PdfBitmap(width, height, format, stride, scan0, callback, context));
+			new PdfBitmap(width, height, format, stride, scan0, callback, context));
 	}
 	catch (...)
 	{
@@ -609,5 +610,274 @@ sbr_EXPORT int sbr_API sbr_PdfBitmapGetHeight(sbr_PdfBitmap bmp)
 	catch (...)
 	{
 		return 0;
+	}
+}
+
+#if defined(_WIN32)
+#define generic_strdup _strdup
+#else
+#define generic_strdup strdup
+#endif
+
+static const char *EMPTY_STRING = "";
+
+sbr_EXPORT void sbr_API sbr_PdfStringRelease(const char *str)
+{
+	if (str != EMPTY_STRING)
+		free(static_cast<void *>(const_cast<char *>(str)));
+}
+
+#include "public/fpdf_text.h"
+#include "core/fpdftext/cpdf_textpage.h"
+
+sbr_EXPORT
+	sbr_PdfText sbr_API
+	sbr_PdfTextLoadFromPage(sbr_PdfPage page)
+{
+	try
+	{
+		auto &ap = nullCheck(page);
+		return reinterpret_cast<sbr_PdfText>(FPDFText_LoadPage(ap->getFPDF_PAGE()));
+	}
+	catch (...)
+	{
+		return nullptr;
+	}
+}
+
+static sbr_PdfText nullCheck(sbr_PdfText p)
+{
+	if (!p)
+		throw std::invalid_argument("text argument is null.");
+	return p;
+}
+
+static sbr_PdfRect &nullCheck(sbr_PdfRect *p)
+{
+	if (!p)
+		throw std::invalid_argument("rect argument is null.");
+	return *p;
+}
+
+static sbr_PdfCharInfo &nullCheck(sbr_PdfCharInfo *p)
+{
+	if (!p)
+		throw std::invalid_argument("charInfo argument is null.");
+	return *p;
+}
+
+sbr_EXPORT int sbr_API
+sbr_PdfTextClose(sbr_PdfText text)
+{
+	FPDFText_ClosePage(reinterpret_cast<FPDF_TEXTPAGE>(text));
+	return 0;
+}
+
+sbr_EXPORT int sbr_API sbr_PdfTextGetLength(sbr_PdfText text)
+{
+	try
+	{
+		return nullCheck(text)->CountChars();
+	}
+	catch (...)
+	{
+		return -1;
+	}
+}
+
+static void convert(sbr_PdfRect &dest, const CFX_FloatRect &src)
+{
+	dest.left = src.left;
+	dest.right = src.right;
+	dest.bottom = src.bottom;
+	dest.top = src.top;
+}
+
+static void convert(sbr_PdfRect *dest, const CFX_FloatRect *src, size_t count)
+{
+	for (int i = 0; i < count; i++)
+	{
+		convert(dest[i], src[i]);
+	}
+}
+
+static void convert(sbr_PdfCharInfo &dest, const CPDF_TextPage::CharInfo &src)
+{
+	dest.unicode = src.m_Unicode;
+	dest.nativeCharCode = src.m_CharCode;
+	dest.emSize = src.m_CharBox.Height();
+	dest.originX = src.m_Origin.x;
+	dest.originY = src.m_Origin.y;
+	convert(dest.charBox, src.m_CharBox);
+	dest.charBox.top = src.m_CharBox.top;
+	dest.charType = static_cast<sbr_PdfCharType>(src.m_CharType);
+}
+
+sbr_EXPORT int sbr_API
+sbr_PdfTextGetCharInfoAt(sbr_PdfText text, int index, sbr_PdfCharInfo *info)
+{
+	try
+	{
+		auto pPage = nullCheck(text);
+		if (index < 0 || index >= pPage->CountChars())
+			throw std::runtime_error("Character index out of range.");
+		nullCheck(info);
+
+		auto &charinfo = pPage->GetCharInfo(index);
+		convert(*info, charinfo);
+		return 0;
+	}
+	catch (...)
+	{
+		return -1;
+	}
+}
+
+sbr_EXPORT int sbr_API sbr_PdfTextGetIndexForPoint(sbr_PdfText text, float x, float y, float xTolerance, float yTolerance)
+{
+	try
+	{
+		auto pPage = nullCheck(text);
+		return pPage->GetIndexAtPos(CFX_PointF(x, y), CFX_SizeF(xTolerance, yTolerance));
+	}
+	catch (...)
+	{
+		return -1;
+	}
+}
+
+sbr_EXPORT int sbr_API sbr_PdfTextGetRectCount(sbr_PdfText text, int index, int count)
+{
+	try
+	{
+		auto pPage = nullCheck(text);
+		if (index < 0 || index + count > pPage->CountChars())
+			throw std::runtime_error("Character index out of range.");
+		return pPage->CountRects(index, count);
+	}
+	catch (...)
+	{
+		return -1;
+	}
+}
+
+// rects: at least equal or larger than the count obtained by sbr_PdfTextGetRectCount
+sbr_EXPORT int sbr_API
+sbr_PdfTextGetRects(sbr_PdfText text, int index, int count, sbr_PdfRect *rects)
+{
+	try
+	{
+		auto pPage = nullCheck(text);
+		if (index < 0 || index + count > pPage->CountChars())
+			throw std::runtime_error("Character index out of range.");
+		nullCheck(rects);
+
+		auto arr = pPage->GetRectArray(index, count);
+		convert(rects, &arr[0], arr.size());
+		return static_cast<int>(arr.size());
+	}
+	catch (...)
+	{
+		return -1;
+	}
+}
+
+// The returned string should be release with sbr_PdfStringRelease
+sbr_EXPORT char *sbr_API sbr_PdfTextGetText(sbr_PdfText text, int index, int count)
+{
+	try
+	{
+		auto pPage = nullCheck(text);
+		if (count < 0)
+			count = -1;
+		if (index < 0 || index + count > pPage->CountChars())
+			throw std::runtime_error("Character index out of range.");
+		auto text = pPage->GetPageText(index, count);
+		return generic_strdup(text.ToUTF8().c_str());
+	}
+	catch (...)
+	{
+		return nullptr;
+	}
+}
+
+template <typename RECTA, typename RECTB>
+static bool intersect(const RECTA &a, const RECTB &b)
+{
+	return ((a.left <= b.left && b.left < a.right) || (a.left < b.right && b.right <= a.right)) &&
+		   ((a.top <= b.top && b.top < a.bottom) || (a.top < b.bottom && b.bottom <= a.bottom));
+}
+
+sbr_EXPORT int
+sbr_PdfTextEnumerateCharsInRect(sbr_PdfText text, sbr_PdfRect *rect, void *context, sbr_PdfCharCallback callback)
+{
+	try
+	{
+		if (!callback)
+			return -1;
+
+		auto pPage = nullCheck(text);
+		const auto &all = nullCheck(rect);
+
+		auto count = pPage->CountChars();
+		for (int i = 0; i < count; i++)
+		{
+			auto &charinfo = pPage->GetCharInfo(i);
+			if (!intersect(all, charinfo.m_CharBox))
+				continue;
+
+			sbr_PdfCharInfo info;
+			convert(info, charinfo);
+			auto err = callback(context, i, &info);
+			if (err)
+				return err;
+		}
+		return 0;
+	}
+	catch (...)
+	{
+		return -1;
+	}
+}
+
+sbr_EXPORT int sbr_API sbr_PdfTextGetRectsByRect(sbr_PdfText text, const sbr_PdfRect *rect, sbr_PdfRect *buffer, int count)
+{
+	try
+	{
+		auto pPage = nullCheck(text);
+		CFX_FloatRect r(rect->left, rect->bottom, rect->right, rect->top);
+
+		std::vector<CFX_FloatRect> arr;
+		int allCount = pPage->CountRects(0, -1);
+		for (int i = 0; i < allCount; i++)
+		{
+			CFX_FloatRect tr;
+			pPage->GetRect(i, &tr);
+			if (r.Contains(tr))
+				arr.push_back(tr);
+		}
+
+		auto count0 = arr.size();
+		if (buffer && count >= count0)
+			convert(buffer, &arr[0], count0);
+		return static_cast<int>(count0);
+	}
+	catch (...)
+	{
+		return -1;
+	}
+}
+
+sbr_EXPORT char *sbr_API sbr_PdfTextGetTextByRect(sbr_PdfText text, const sbr_PdfRect *rect)
+{
+	try
+	{
+		CFX_FloatRect r(rect->left, rect->bottom, rect->right, rect->top);
+		auto s = nullCheck(text)->GetTextByRect(r);
+		return generic_strdup(s.ToUTF8().c_str());
+	}
+	catch (...)
+	{
+		return nullptr;
 	}
 }

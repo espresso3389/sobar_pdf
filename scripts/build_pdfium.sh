@@ -90,10 +90,15 @@ pdf_enable_xfa = false
 pdf_enable_v8 = false
 # Reduce dependency to GLIBC
 #use_glib = false
+EOF
+
+if [[ "$TARGET_OS" == "ios" ]]; then
+cat <<EOF >> $BUILDDIR/args.gn
 ios_enable_code_signing = false
 #use_xcode_clang = true
 enable_ios_bitcode= $ENABLE_BIT_CODE
 EOF
+fi
 
 pushd $BUILDDIR
 gn gen .
