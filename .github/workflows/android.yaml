@@ -1,0 +1,41 @@
+
+name: android
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - release*
+
+    paths-ignore:
+    - 'README.md'
+    - '.vscode/**'
+    - '.gitignore'
+    - '.gitattributes'
+    - '.editorconfig'
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        arch: ["arm", "arm64", "x86", "x64"]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      # Just installing ninja-build is enough for GitHub Actions
+      # Not to use ./build/install-build-deps.sh
+      - name: Prerequisites
+        run: sudo apt install ninja-build gcc-multilib g++-multilib
+
+      - name: Build
+        run: ./build.sh ${{ matrix.arch }} android
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: sobar-linux-${{ matrix.arch }}-r${{ github.run_number }}-${{ env.SobarCOMMIT }}
+          path: dist/${{ matrix.arch }}
+          #retention-days: 1
