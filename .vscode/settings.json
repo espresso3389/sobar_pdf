@@ -45,5 +45,10 @@
     "files.watcherExclude": {
         ".cache/**": true,
         ".work/**": true
-    }
+    },
+    "cSpell.words": [
+        "pdfium",
+        "sobar",
+        "Takashi"
+    ]
 }
