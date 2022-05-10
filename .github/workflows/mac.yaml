@@ -2,17 +2,14 @@ name: macOS
 
 on:
   push:
-    branches:
-      - main
-    tags:
-      - release*
-
     paths-ignore:
     - 'README.md'
     - '.vscode/**'
     - '.gitignore'
     - '.gitattributes'
     - '.editorconfig'
+
+  workflow_dispatch:
 
 jobs:
   build:
@@ -23,6 +20,7 @@ jobs:
         arch: ["x64", "arm64"]
     outputs:
       suffix: ${{ steps.filename.outputs.suffix }}
+    if: endsWith(github.ref, 'mac') || (!endsWith(github.ref, 'android') && !endsWith(github.ref, 'ios') && !endsWith(github.ref, 'linux') && !endsWith(github.ref, 'windows'))
 
     steps:
       - uses: actions/checkout@v2

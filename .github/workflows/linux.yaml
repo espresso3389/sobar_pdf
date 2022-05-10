@@ -3,17 +3,14 @@ name: linux
 
 on:
   push:
-    branches:
-      - main
-    tags:
-      - release*
-
     paths-ignore:
     - 'README.md'
     - '.vscode/**'
     - '.gitignore'
     - '.gitattributes'
     - '.editorconfig'
+
+  workflow_dispatch:
 
 jobs:
   build:
@@ -22,6 +19,7 @@ jobs:
     strategy:
       matrix:
         arch: ["x86", "x64"]
+    if: endsWith(github.ref, 'linux') || (!endsWith(github.ref, 'android') && !endsWith(github.ref, 'ios') && !endsWith(github.ref, 'windows') && !endsWith(github.ref, 'mac'))
 
     steps:
       - uses: actions/checkout@v2
