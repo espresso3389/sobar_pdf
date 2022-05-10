@@ -53,6 +53,9 @@ fi
 
 ROOTDIR=$(pwd)
 if [[ "$TARGET_OS" == "android" && ! -e $ROOTDIR/.android.deps ]]; then
+  sudo dpkg --add-architecture i386
+  sudo apt update
+  sudo apt install libglib2.0-0:i386
   $ROOTDIR/pdfium/build/install-build-deps-android.sh
   touch $ROOTDIR/.android.deps
 fi
