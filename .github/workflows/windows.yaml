@@ -26,8 +26,9 @@ jobs:
 
       - name: Installing Debugging Tools for Windows...
         run: |
-          powershell -c "Invoke-WebRequest -Uri 'https://go.microsoft.com/fwlink/?linkid=2164145' -OutFile winsdksetup.exe -UseBasicParsing ;"
-          .\winsdksetup.exe /features "OptionId.WindowsDesktopDebuggers" /q /norestart
+          Invoke-WebRequest -Uri 'https://go.microsoft.com/fwlink/?linkid=2164145' -OutFile winsdksetup.exe -UseBasicParsing
+          Start-Process winsdksetup.exe -ArgumentList '/features OptionId.WindowsDesktopDebuggers /q' -Wait
+          Remove-Item -Force winsdksetup.exe
 
       - name: Build
         run: .\build.ps1 ${{ matrix.arch }}
