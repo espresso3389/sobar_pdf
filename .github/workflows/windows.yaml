@@ -3,11 +3,6 @@ name: windows
 
 on:
   push:
-    branches:
-      - main
-    tags:
-      - release*
-
     paths-ignore:
     - 'README.md'
     - '.vscode/**'
