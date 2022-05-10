@@ -35,7 +35,7 @@ else
 fi
 
 if [[ "$TARGET_OS" == "ios" && "$GN_ARCH" == "arm"* ]]; then
-  ENABLE_BIT_CODE=true
+  ENABLE_BIT_CODE=false #true
 else
   ENABLE_BIT_CODE=false
 fi
