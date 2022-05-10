@@ -44,6 +44,7 @@ cmake -S . -B $outDir -G Ninja \
     -DSOBAR_TMP_DIR=$tmpDir \
     -DSOBAR_CACHE_DIR=$cacheDir \
     -DCMAKE_OSX_ARCHITECTURES=$arch_full \
+    -DIOS_BITCODE=0 \
     $IOS_DEFINITIONS
 
 cmake --build $outDir
