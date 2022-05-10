@@ -15,6 +15,8 @@ on:
     - '.gitattributes'
     - '.editorconfig'
 
+  workflow_dispatch:
+
 jobs:
   build:
     runs-on: windows-latest
@@ -22,9 +24,15 @@ jobs:
     strategy:
       matrix:
         arch: ["x86", "x64"]
+    if: endsWith(github.ref, 'windows') || (!endsWith(github.ref, 'android') && !endsWith(github.ref, 'ios') && !endsWith(github.ref, 'linux') && !endsWith(github.ref, 'mac'))
 
     steps:
       - uses: actions/checkout@v2
+
+      - name: Installing Debugging Tools for Windows...
+        run: |
+          powershell -c "Invoke-WebRequest -Uri 'https://go.microsoft.com/fwlink/?linkid=2164145' -OutFile winsdksetup.exe -UseBasicParsing ;"
+          .\winsdksetup.exe /features "OptionId.WindowsDesktopDebuggers" /q /norestart
 
       - name: Build
         run: .\build.ps1 ${{ matrix.arch }}
